@@ -1,5 +1,3 @@
-<img src="https://r2cdn.perplexity.ai/pplx-full-logo-primary-dark%402x.png" style="height:64px;margin-right:32px"/>
-
 # Can you generate a similar problem statement with different dataset
 
 Certainly! Here's a similar comprehensive problem statement for a text classification project, but using a different dataset — movie reviews — and covering analogous learning objectives and tasks:
