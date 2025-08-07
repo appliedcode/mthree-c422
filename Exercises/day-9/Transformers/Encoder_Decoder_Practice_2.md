@@ -7,6 +7,8 @@ Translate these three English sentences into French using `Helsinki-NLP/opus-mt-
 2. “I would like to order a coffee, please.”
 3. “What time does the train to Paris depart?”
 
+Initialize a translation pipeline and print each English sentence alongside its French translation.
+
 **Solution:**
 
 ```python
@@ -33,7 +35,10 @@ for eng in sentences:
 ## Exercise B: Paraphrasing with T5
 
 **Task:**
-Generate two paraphrases of the sentence “Deep learning models require large amounts of data to train effectively.” using `google/t5-small`. Use sampling parameters: `num_return_sequences=2`, `do_sample=True`, `temperature=0.8`.
+Use `google/t5-small` as a paraphrasing model. Prefix each input with `"paraphrase: "` and generate two paraphrases for this sentence:
+> “Deep learning models require large amounts of data to train effectively.”
+
+Set `num_return_sequences=2`, `do_sample=True`, and `temperature=0.8`. Print both paraphrased outputs.
 
 **Solution:**
 
@@ -67,8 +72,10 @@ for i, out in enumerate(outputs, 1):
 ## Exercise C: Question Answering over a Context
 
 **Task:**
-Answer the question “In how many fields did Marie Curie win Nobel Prizes?” using `deepset/roberta-base-squad2` on this context:
-“Marie Curie was the first woman to win a Nobel Prize, and she remains the only person awarded Nobel Prizes in two different scientific fields.”
+Use `deepset/roberta-base-squad2` as an encoder–decoder question-answering pipeline. Given the context:
+> “Marie Curie was the first woman to win a Nobel Prize, and she remains the only person awarded Nobel Prizes in two different scientific fields.”
+Answer the question:
+> “In how many fields did Marie Curie win Nobel Prizes?”
 
 **Solution:**
 
@@ -96,7 +103,10 @@ print(f"Answer: {result['answer']}")
 ## Exercise D: Code Generation from Description
 
 **Task:**
-Generate a Python function that takes a list of numbers and returns it sorted in ascending order, using `Salesforce/codet5-small`.
+Use `Salesforce/codet5-small` as an encoder–decoder code-generation pipeline. Provide this prompt:
+> “Write a Python function that takes a list of numbers and returns the list sorted in ascending order.”
+
+Generate and print the complete function code.
 
 **Solution:**
 
@@ -121,9 +131,17 @@ print(output[0]['generated_text'])
 ## Exercise E: Text Infilling with BART
 
 **Task:**
-Fill in the masked tokens in the sentence
-“To make the recipe, first preheat the oven to <mask> degrees, then <mask> the butter and sugar together.”
-Use `facebook/bart-large` and display the top 3 options for each mask.
+Use `facebook/bart-large` for text infilling. Provide this incomplete sentence with `[MASK]` tokens:
+> “To make the recipe, first preheat the oven to [MASK] degrees, then [MASK] the butter and sugar together.”
+
+Set `task="fill-mask"` and print the top 3 filled-in options for each mask.
+
+*Hints for all exercises:*
+
+- Initialize the appropriate `pipeline` with the correct `model` and `task`.
+- For translation and paraphrasing, adjust sampling parameters.
+- For fill-mask, the pipeline will return a list of possible tokens for each mask.
+- Print inputs and outputs clearly for comparison.
 
 **Solution:**
 
