@@ -1,7 +1,3 @@
-# Can you generate a similar problem statement with different dataset
-
-Certainly! Here's a similar comprehensive problem statement for a text classification project, but using a different dataset — movie reviews — and covering analogous learning objectives and tasks:
-
 # 🎬 Session: Movie Reviews Sentiment Classification
 
 ### **Learning Objectives:**
