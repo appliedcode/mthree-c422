@@ -1,9 +1,3 @@
-<img src="https://r2cdn.perplexity.ai/pplx-full-logo-primary-dark%402x.png" style="height:64px;margin-right:32px"/>
-
-# could you generate again with different dataset
-
-Certainly! Here’s a similar comprehensive problem statement for a **Sentiment Analysis** project, but using a different dataset — **Social Media Posts (e.g., Tweets) Sentiment Analysis**.
-
 # 📱 Sentiment Analysis on Social Media Posts (Tweets)
 
 ### **Learning Objectives:**
