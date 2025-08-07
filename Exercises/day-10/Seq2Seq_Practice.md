@@ -1,5 +1,3 @@
-# \# -*- coding: utf-8 -*-
-
 ### Exercise 1: Translate Multiple Sentences
 
 **Problem:**
