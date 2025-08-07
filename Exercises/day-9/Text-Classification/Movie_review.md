@@ -79,7 +79,6 @@ Example reviews:
 You can use publicly available movie reviews datasets such as:
 
 - [IMDb Movie Review Dataset (small balanced subset)](https://ai.stanford.edu/~amaas/data/sentiment/)
-- [Sentiment140 Twitter Movie Reviews Dataset](http://help.sentiment140.com/for-students/)
 - Or create a custom dataset by scraping reviews from trusted movie review sites (e.g., Rotten Tomatoes, Metacritic)
 
 
