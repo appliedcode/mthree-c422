@@ -1,5 +1,16 @@
 ## Exercise Set: Transformer-Based Encoder-Decoder Practice
 
+**Hint:**
+Consider the order of operations (e.g., should you translate before or after summarizing?). Handle different input/output formats for each task.
+
+## **Getting Started Tips:**
+
+1. Start with Exercise 1 - it's the simplest modification of your existing code
+2. Copy your current code and modify it step by step
+3. Test each change with the same input text to see differences
+4. Print intermediate results to understand what's happening
+5. Don't worry if some experiments don't work perfectly - learning from failures is valuable!
+
 ### Exercise 1: **Parameter Experimentation**
 
 **Task:**
@@ -126,17 +137,6 @@ def multi_task_processor(text, tasks=['summarize', 'sentiment', 'translate']):
     # Return combined results
     pass
 ```
-
-**Hint:**
-Consider the order of operations (e.g., should you translate before or after summarizing?). Handle different input/output formats for each task.
-
-## **Getting Started Tips:**
-
-1. Start with Exercise 1 - it's the simplest modification of your existing code
-2. Copy your current code and modify it step by step
-3. Test each change with the same input text to see differences
-4. Print intermediate results to understand what's happening
-5. Don't worry if some experiments don't work perfectly - learning from failures is valuable!
 
 **Remember:** The goal is to understand how Transformer encoder-decoder models work in practice, not to create perfect solutions!
 
