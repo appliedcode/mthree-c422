@@ -1,5 +1,3 @@
-<img src="https://r2cdn.perplexity.ai/pplx-full-logo-primary-dark%402x.png" style="height:64px;margin-right:32px"/>
-
 # Transformer-Based Encoder–Decoder Practice Exercises with Solutions
 
 The following exercises build on your summarization program and cover key concepts in Transformer encoder–decoder models. Each exercise includes a concise solution outline.
