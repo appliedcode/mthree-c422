@@ -27,8 +27,7 @@ This project will help you understand applying Transformer models to multi-class
 3. **Evaluation:**
     - Evaluate the trained model on the test data using metrics such as accuracy, precision, recall, and F1-score for multi-class classification.
     - Generate and analyze a confusion matrix to better understand model performance across sentiment classes.
-4. **Optional Extension:**
-    - Discuss or demonstrate audio feature extraction techniques such as MFCCs and their relationship with text-based sentiment/emotion recognition to gain broader insights into multimodal sentiment analysis.
+
 
 ### Hints and Guidance:
 
@@ -38,7 +37,3 @@ This project will help you understand applying Transformer models to multi-class
 - Utilize Huggingface’s `Trainer` API for streamlined fine-tuning and evaluation.
 - Use `sklearn.metrics` or built-in Trainer utilities for evaluation metrics and confusion matrix computation.
 - Analyze classification errors to refine understanding and improve model robustness.
-- Keep the assignment achievable within about one hour, considering dataset size and resource constraints.
-
-This assignment offers a practical experience of multi-class sentiment classification on a real, large-scale dataset using advanced Transformer models. Let me know if you would like me to prepare a detailed Colab notebook to implement this assignment.
-
