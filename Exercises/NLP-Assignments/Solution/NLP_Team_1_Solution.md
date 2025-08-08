@@ -168,7 +168,4 @@ mfccs = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=13)
 print(f"MFCC shape: {mfccs.shape}")
 ```
 
-This solution provides a comprehensive workflow for multi-class text classification using Transformers on the 20 Newsgroups dataset. You can run this on Colab with GPU acceleration for efficient fine-tuning within 1 hour.
-
-Let me know if you want a ready-to-run Colab notebook script based on this solution!
 
