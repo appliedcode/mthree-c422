@@ -1,8 +1,4 @@
-<img src="https://r2cdn.perplexity.ai/pplx-full-logo-primary-dark%402x.png" style="height:64px;margin-right:32px"/>
-
-# could you generate the solution?
-
-Certainly! Below is a complete solution for **sentiment classification on the IMDb Movie Reviews dataset using BERT**, based on the problem statement and dataset from Hugging Face `datasets`. This code covers:
+## Below is a complete solution for **sentiment classification on the IMDb Movie Reviews dataset using BERT**, based on the problem statement and dataset from Hugging Face `datasets`. This code covers:
 
 - Loading and exploring the dataset
 - Cleaning the text
