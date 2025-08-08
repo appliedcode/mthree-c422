@@ -30,8 +30,6 @@ Your task is to preprocess the raw text data, tokenize it for Transformer input,
 3. **Evaluation:**
     - Evaluate model performance on the test dataset using multi-class classification metrics including accuracy, precision, recall, F1-score for each class and overall weighted averages.
     - Generate and analyze a confusion matrix to observe classification errors among categories.
-4. **Optional Extension:**
-    - Briefly discuss and optionally demonstrate audio feature extraction techniques (such as MFCCs) and how such approaches relate to emotion or sentiment recognition from speech signals, expanding your perspective to multimodal NLP tasks.
 
 ### Hints and Guidance:
 
