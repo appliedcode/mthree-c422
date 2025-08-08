@@ -190,7 +190,3 @@ This solution guides you through:
 - Evaluating with accuracy, precision, recall, F1-score, and confusion matrix.
 - Extending understanding by linking text and audio sentiment recognition via MFCC feature extraction.
 
-This workflow is practical and achievable in a typical 1-hour session on a Colab environment with GPU enabled.
-
-If you want, I can help prepare a runnable Colab notebook script based on this solution. Just let me know!
-
