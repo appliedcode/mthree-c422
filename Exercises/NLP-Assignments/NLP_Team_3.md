@@ -26,8 +26,6 @@ Your task is to preprocess the raw review texts, tokenize them for Transformer i
 3. **Evaluation:**
     - Evaluate the model on the test split using metrics such as accuracy, precision, recall, and F1-score.
     - Optionally, generate a confusion matrix to visualize classification results.
-4. **Optional Extension:**
-    - Briefly explore how audio-based sentiment detection using MFCC features relates to text-based sentiment analysis, providing insights into multimodal emotion recognition.
 
 ### Hints and Guidance:
 
@@ -37,7 +35,6 @@ Your task is to preprocess the raw review texts, tokenize them for Transformer i
 - Utilize Huggingface’s `Trainer` API for smooth training and evaluation workflow.
 - Use `sklearn.metrics` or the Trainer’s built-in compute_metrics utilities for evaluation.
 - Analyze misclassified samples for deeper understanding.
-- Ensure the assignment is achievable within about one hour.
 
 This assignment provides a hands-on experience with binary text classification leveraging robust Transformer models and a large-scale real-world sentiment dataset. Let me know if you want me to prepare a ready-to-run Colab notebook snippet for this task.
 
