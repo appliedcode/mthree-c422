@@ -29,8 +29,6 @@ Your task is to preprocess the raw text data, tokenize it for Transformer input,
 3. **Evaluation:**
     - Evaluate model performance using multi-label metrics such as accuracy, precision, recall, F1-score (micro, macro), and analyze the confusion matrix per category.
     - Optionally handle class imbalance with weighted loss or sampling techniques.
-4. **Optional Extension:**
-    - Briefly discuss or demonstrate audio feature extraction techniques (e.g., MFCCs) and their relevance to emotion or sentiment recognition, to extend your perspective to multimodal NLP tasks.
 
 ### Hints and Guidance:
 
@@ -41,6 +39,5 @@ Your task is to preprocess the raw text data, tokenize it for Transformer input,
 - Leverage Huggingface `Trainer` API with custom compute_metrics to handle multi-label evaluation.
 - Configure training parameters (batch size ~8-16, 2-3 epochs, suitable learning rate) to balance training time and accuracy.
 - Analyze misclassifications to understand errors and improve the model.
-- Keep the scope manageable to complete within roughly 1 hour but encourage exploration beyond basics.
 
 
