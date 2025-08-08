@@ -50,8 +50,3 @@ Build and evaluate a transformer-based audio classification model using the ESC-
 - Python notebook or script implementing data loading, preprocessing, training, and evaluation.
 - Visualizations of attention weights and model performance metrics.
 - A brief report or markdown summarizing findings, challenges, and future directions.
-
-This problem encourages hands-on experience with transformer models for audio classification on a real, publicly available dataset, expanding beyond speech recognition to environmental sound understanding.
-
-If you'd like, I can also help generate starter code or a complete Colab notebook for this task! Would you be interested?
-
