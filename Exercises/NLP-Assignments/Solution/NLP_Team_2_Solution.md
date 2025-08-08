@@ -250,7 +250,3 @@ This solution equips you to:
 - Visualize confusion matrices per label.
 - Gain insight into related audio-based sentiment/emotion recognition using MFCC extraction.
 
-This approach balances model complexity and practical execution time, making it suitable for about a 1-hour assignment on a typical Colab environment with GPU.
-
-If you want, I can help you with a fully prepared Colab notebook based on this solution. Let me know!
-
