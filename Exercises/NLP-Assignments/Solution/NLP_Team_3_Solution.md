@@ -180,19 +180,4 @@ This solution covers all the key aspects of the assignment:
 - Evaluating model performance with standard metrics
 - Optionally visualizing confusion matrix and discussing audio sentiment approaches
 
-If you want, I can prepare a ready-to-run Google Colab notebook with this entire solution. Just let me know!
-
-<div style="text-align: center">⁂</div>
-
-[^1]: https://www.tensorflow.org/datasets/catalog/yelp_polarity_reviews
-
-[^2]: https://hex.tech/templates/sentiment-analysis/sentiment-analysis/
-
-[^3]: https://github.com/wutianqidx/Yelp-Review-Sentiment-Analysis
-
-[^4]: https://metatext.io/datasets/yelp-polarity-reviews
-
-[^5]: https://www.kaggle.com/datasets/irustandi/yelp-review-polarity
-
-[^6]: https://www.kaggle.com/code/anasofiauzsoy/yelp-review-sentiment-analysis-tensorflow-tfds
 
