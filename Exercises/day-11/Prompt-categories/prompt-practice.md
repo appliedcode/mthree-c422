@@ -1,5 +1,5 @@
 # Lab Exercise 1 — Zero-Shot Prompt Engineering
-
+"""
 ### Objective
 
 - Classify text into target categories without any training, by crafting a natural language instruction.
