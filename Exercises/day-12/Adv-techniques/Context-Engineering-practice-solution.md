@@ -1,3 +1,4 @@
+## **Self-Practice Problems – Context Management \& Prompt Optimization**
 ## **Setup – Run This First in Colab**
 
 Make sure you’ve securely stored your API key in Colab Secrets (only once per account/session):
