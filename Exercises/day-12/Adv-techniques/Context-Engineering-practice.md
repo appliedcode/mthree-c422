@@ -1,13 +1,3 @@
-<img src="https://r2cdn.perplexity.ai/pplx-full-logo-primary-dark%402x.png" style="height:64px;margin-right:32px"/>
-
-# Generate another set of problem statement based on above topic to practice by student on its own
-
-Got it ✅ — you want **a fresh set of self-practice problem statements** around the **Context Management** and **Prompt Optimization** topics so that students can apply what they learned from our earlier lab exercises.
-
-Here’s a **practice set** designed for individual work in Colab using the same **OpenAI client + Colab Secrets setup** from the previous version.
-
-***
-
 ## **Self-Practice Problems – Context Management \& Prompt Optimization**
 
 ### **Part A – Context Management**
