@@ -1,13 +1,3 @@
-<img src="https://r2cdn.perplexity.ai/pplx-full-logo-primary-dark%402x.png" style="height:64px;margin-right:32px"/>
-
-# Generate problem statement based on above topic for student to try on its own
-
-Got it ✅ — you want a **fresh set of self‑practice problem statements** for students to work on **Handling Ambiguity, Troubleshooting, and Prompt Failures** (based on the last Colab lab exercises we created).
-
-Here’s a **practice set** they can attempt independently — each is designed so students can first try a “bad prompt” or “failure scenario,” then fix it by applying techniques like clarification, refinement, splitting tasks, and anchoring facts.
-
-***
-
 ## **Self‑Practice Problems – Handling Ambiguity, Troubleshooting \& Prompt Failures**
 
 
@@ -105,8 +95,4 @@ For each problem:
 3. Compare results and write **2–3 observations** about output quality improvement.
 
 ***
-
-If you want, I can now **package these into a runnable Colab workbook** where the “bad” prompts are pre-filled and students fill in their “fixed” prompts — with cells to run and compare outputs.
-
-Do you want me to prepare that interactive **student practice notebook**?
 
