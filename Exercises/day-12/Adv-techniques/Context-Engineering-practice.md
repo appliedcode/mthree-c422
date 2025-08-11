@@ -103,7 +103,3 @@ Students will refine vague prompts into clear, specific instructions and analyze
 
 ***
 
-If you want, I can **package these problems into a ready-to-run Colab notebook** where placeholders are left for students to fill in code — so they learn by actually typing rather than just reading.
-
-Do you want me to prepare that interactive **practice notebook version**?
-
