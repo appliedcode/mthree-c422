@@ -1,13 +1,3 @@
-<img src="https://r2cdn.perplexity.ai/pplx-full-logo-primary-dark%402x.png" style="height:64px;margin-right:32px"/>
-
-# Generate problem statement based on above code with another data set as team assignment.
-
-Got it ✅ — you want me to take the **comprehensive Colab starter code** we just built and turn it into a **fresh team assignment problem statement**, but this time we’ll swap in a **different dataset / theme** so students can work on the same structure with new content.
-
-Here’s the **team assignment brief** you can share:
-
-***
-
 # **Team Project: End-to-End Prompt Engineering with Renewable Energy Knowledge Dataset**
 
 ## **Project Overview**
@@ -102,8 +92,3 @@ Renewable Energy Dataset:
 💡 **Hint:** You can extend beyond the given dataset by adding real‑world renewable energy challenges, cost data, or geographic considerations, but keep prompts safe, clear, and bias‑free.
 
 ***
-
-If you want, I can now produce a **dataset‑integrated, ready‑to‑run version** of the starter Colab notebook with this renewable energy theme already embedded so your students only need to focus on filling in the prompt content.
-
-Do you want me to prepare that?
-
