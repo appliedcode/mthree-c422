@@ -1,12 +1,3 @@
-<img src="https://r2cdn.perplexity.ai/pplx-full-logo-primary-dark%402x.png" style="height:64px;margin-right:32px"/>
-
-# Generate solution + code for above problem statement
-
-Alright ✅ — here’s the **full worked solution + runnable Colab code** for the **Renewable Energy Prompt Engineering Team Assignment** we defined earlier.
-This solution takes the **starter template** we built before, adapts it fully to the **renewable energy dataset**, and demonstrates all the required tasks from basic prompting through to advanced techniques, monitoring, ethics, and privacy.
-
-***
-
 ## **Google Colab Solution: Renewable Energy Prompt Engineering**
 
 ### **Step 0 — Setup**
@@ -285,7 +276,4 @@ print("Risky:\n", risk_resp, "\n\nSafe:\n", safe_resp)
 
 ***
 
-If you want, I can now turn this into a **beautifully formatted downloadable `.ipynb` Colab file** that includes **Markdown explanations for each section** so students get guided instructions while running the code.
-
-Do you want me to prepare that ready-to-use notebook file?
 
