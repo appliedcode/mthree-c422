@@ -1,19 +1,3 @@
-<img src="https://r2cdn.perplexity.ai/pplx-full-logo-primary-dark%402x.png" style="height:64px;margin-right:32px"/>
-
-# Generate solution + code for the same
-
-Got it ✅ — you want me to produce the **complete Colab‑ready solution with Python code and explanations** for the **Credit Approval AI Bias Detection and Mitigation** problem set that I just created.
-
-I’ll walk through **each exercise step‑by‑step**, including:
-
-- Code cells for analysis and computation
-- Visualizations for distributions and disparities
-- Model training and bias detection
-- Fairness metric calculations (Demographic Parity, Equal Opportunity, Disparate Impact)
-- Bias mitigation example (pre‑processing re‑balancing)
-
-***
-
 ## **Solution: Detecting \& Mitigating Bias in Credit Approval AI**
 
 ```python
@@ -255,12 +239,3 @@ Ethical Recommendations:
 - This approach is flexible to extend with **in-processing** or **post-processing** methods too.
 
 ***
-
-If you want, I can **extend this** with:
-
-- **Fairlearn** or **AIF360** library fairness evaluations
-- Interactive dashboards for bias monitoring
-- Threshold optimization per group for Equalized Odds
-
-Do you want me to take this next step and **integrate Fairlearn to automate fairness metric tracking**?
-
