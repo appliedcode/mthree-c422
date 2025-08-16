@@ -124,11 +124,6 @@ class IrisFeatures(BaseModel):
     - CI/CD workflow snapshot
     - MLflow run comparison screenshot
     - Monitoring dashboard snapshots
-- **5-Minute Video Walkthrough:**
-    - Show data preparation and versioning
-    - Train models and demonstrate MLflow UI
-    - Build and run the Dockerized API, perform sample predictions
-    - Display logs in SQLite and Grafana dashboard
 
 ***
 
