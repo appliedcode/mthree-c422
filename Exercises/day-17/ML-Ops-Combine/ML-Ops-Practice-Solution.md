@@ -110,9 +110,10 @@ Open http://localhost:5000, go to **Models** tab, and promote the version with h
 import mlflow.pyfunc
 from fastapi import FastAPI
 from pydantic import BaseModel, conlist
-from typing import List
+import numpy as np
+from contextlib import asynccontextmanager
 
-# Must match the feature order as in training!
+# Feature names must match training order
 FEATURE_NAMES = [
     "mean radius", "mean texture", "mean perimeter", "mean area", "mean smoothness",
     "mean compactness", "mean concavity", "mean concave points", "mean symmetry", "mean fractal dimension",
@@ -122,16 +123,19 @@ FEATURE_NAMES = [
     "worst compactness", "worst concavity", "worst concave points", "worst symmetry", "worst fractal dimension"
 ]
 
+# Use conlist with positional arguments for fixed size list of floats
 class CancerInput(BaseModel):
-    features: conlist(float, min_items=30, max_items=30)
+    features: conlist(float, min_length=30, max_length=30)  # exactly 30 floats
 
-app = FastAPI()
-
-@app.on_event("startup")
-def load_model():
-    # Loads the latest Production model. Change "Production" to "Staging" if needed.
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup logic
     global model
-    model = mlflow.pyfunc.load_model("models:/breast_cancer_diagnosis/Production")
+    model = mlflow.pyfunc.load_model("models:/breast_cancer_diagnosis/latest")
+    yield
+    # Shutdown logic (if any) can go here
+
+app = FastAPI(lifespan=lifespan)
 
 @app.get("/health")
 def health():
@@ -139,12 +143,12 @@ def health():
 
 @app.post("/predict")
 def predict(inp: CancerInput):
-    preds = model.predict([inp.features])
-    prob = model.predict_proba([inp.features])[:,1].tolist()[0]
-    label = int(preds)
+    input_array = np.array(inp.features).reshape(1, -1)
+    preds = model.predict(input_array)
+    label = int(preds[0])  # preds is usually an array or list
+    # No probability returned since predict_proba not available
     return {
-        "prediction": label,       # 0=benign, 1=malignant
-        "probability_malignant": prob
+        "prediction": label
     }
 ```
 
