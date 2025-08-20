@@ -37,8 +37,8 @@ import joblib
 import matplotlib.pyplot as plt
 from collections import Counter
 
-from ml_metadata.metadata_store import metadata_store
-from ml_metadata.proto import metadata_store_pb2
+from sqlalchemy import create_engine, Column, Integer, String, ForeignKey
+from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 
 # --- Setup directories ---
 DATA_DIR = 'data'
@@ -46,112 +46,132 @@ MODEL_DIR = 'models'
 os.makedirs(DATA_DIR, exist_ok=True)
 os.makedirs(MODEL_DIR, exist_ok=True)
 
-# --- Initialize local ML Metadata store with SQLite ---
-def init_metadata_store():
-    connection_config = metadata_store_pb2.ConnectionConfig()
-    connection_config.sqlite.filename_uri = 'metadata.db'
-    connection_config.sqlite.connection_mode = metadata_store_pb2.SqliteConfig.READWRITE_OPENCREATE
-    store = metadata_store.MetadataStore(connection_config)
-    print("Initialized local ML metadata store.")
-    return store
+# --- SQLAlchemy base and ORM models ---
+Base = declarative_base()
 
-# --- Create and save a simple training dataset ---
+class Artifact(Base):
+    __tablename__ = 'artifacts'
+    id = Column(Integer, primary_key=True)
+    type = Column(String)           # e.g. 'DataSet', 'SavedModel'
+    uri = Column(String)
+    version = Column(Integer)
+    name = Column(String, nullable=True)
+    split = Column(String, nullable=True)  # For datasets: e.g. 'train'
+
+class Execution(Base):
+    __tablename__ = 'executions'
+    id = Column(Integer, primary_key=True)
+    type = Column(String)  # e.g. 'Trainer'
+    state = Column(String)  # e.g. 'RUNNING', 'COMPLETED'
+
+class Event(Base):
+    __tablename__ = 'events'
+    id = Column(Integer, primary_key=True)
+    artifact_id = Column(Integer, ForeignKey('artifacts.id'))
+    execution_id = Column(Integer, ForeignKey('executions.id'))
+    type = Column(String)  # 'INPUT' or 'OUTPUT'
+
+    artifact = relationship('Artifact')
+    execution = relationship('Execution')
+
+# --- Initialize SQLite database and session ---
+def init_metadata_store(db_url='sqlite:///metadata.db'):
+    engine = create_engine(db_url)
+    Base.metadata.create_all(engine)
+    Session = sessionmaker(bind=engine)
+    print("Initialized local metadata store (SQLite).")
+    return Session()
+
+# --- Create and save a simple dataset ---
 def create_and_save_dataset():
     print("Creating sample dataset...")
     data = pd.DataFrame({
         'feature1': range(10),
         'feature2': [x * 2 for x in range(10)],
-        'label': [0, 1]*5
+        'label': [0, 1] * 5
     })
     data_path = os.path.join(DATA_DIR, 'train_dataset.csv')
     data.to_csv(data_path, index=False)
     print(f"Dataset saved at {data_path}")
     return data_path
 
-# --- Register metadata types (Artifact and Execution) ---
-def register_types(store):
-    data_type = metadata_store_pb2.ArtifactType(name='DataSet')
-    data_type.properties['version'] = metadata_store_pb2.INT
-    data_type.properties['split'] = metadata_store_pb2.STRING
-    data_type_id = store.put_artifact_type(data_type)
+# --- Register dataset artifact ---
+def register_dataset(session, data_path, version=1, split='train'):
+    artifact = Artifact(
+        type='DataSet',
+        uri=f'file://{os.path.abspath(data_path)}',
+        version=version,
+        split=split
+    )
+    session.add(artifact)
+    session.commit()
+    print(f"Registered dataset artifact ID: {artifact.id}")
+    return artifact
 
-    model_type = metadata_store_pb2.ArtifactType(name='SavedModel')
-    model_type.properties['version'] = metadata_store_pb2.INT
-    model_type.properties['name'] = metadata_store_pb2.STRING
-    model_type_id = store.put_artifact_type(model_type)
+# --- Register model artifact ---
+def register_model(session, model_path, name='LogisticRegressionModel', version=1):
+    artifact = Artifact(
+        type='SavedModel',
+        uri=f'file://{os.path.abspath(model_path)}',
+        name=name,
+        version=version
+    )
+    session.add(artifact)
+    session.commit()
+    print(f"Registered model artifact ID: {artifact.id}")
+    return artifact
 
-    trainer_type = metadata_store_pb2.ExecutionType(name='Trainer')
-    trainer_type.properties['state'] = metadata_store_pb2.STRING
-    trainer_type_id = store.put_execution_type(trainer_type)
+# --- Register execution ---
+def register_execution(session, exec_type='Trainer', state='RUNNING'):
+    execution = Execution(type=exec_type, state=state)
+    session.add(execution)
+    session.commit()
+    print(f"Started execution ID: {execution.id} with state: {state}")
+    return execution
 
-    print("Registered metadata types.")
-    return data_type_id, model_type_id, trainer_type_id
+# --- Link artifact and execution through events ---
+def link_artifact_execution(session, artifact_id, execution_id, event_type):
+    event = Event(artifact_id=artifact_id, execution_id=execution_id, type=event_type)
+    session.add(event)
+    session.commit()
 
-# --- Register dataset artifact in metadata store ---
-def register_dataset(store, data_type_id, data_path):
-    data_artifact = metadata_store_pb2.Artifact()
-    data_artifact.type_id = data_type_id
-    data_artifact.uri = f'file://{os.path.abspath(data_path)}'
-    data_artifact.properties['version'].int_value = 1
-    data_artifact.properties['split'].string_value = 'train'
-    [registered_data] = store.put_artifacts([data_artifact])
-    print(f"Registered dataset artifact ID: {registered_data.id}")
-    return registered_data
+# --- Mark execution as COMPLETED ---
+def mark_execution_completed(session, execution):
+    execution.state = 'COMPLETED'
+    session.commit()
+    print(f"Execution {execution.id} marked as COMPLETED.")
 
-# --- Train ML model and log training execution and artifacts ---
-def train_and_log(store, trainer_type_id, model_type_id, data_artifact, data_path):
+# --- Train model and log metadata ---
+def train_and_log(session, dataset_artifact, dataset_path):
     print("Training model...")
-    df = pd.read_csv(data_path)
+    df = pd.read_csv(dataset_path)
     X = df[['feature1', 'feature2']]
     y = df['label']
 
     model = LogisticRegression()
     model.fit(X, y)
-    
+
     model_path = os.path.join(MODEL_DIR, 'trained_model.joblib')
     joblib.dump(model, model_path)
     print(f"Model saved at {model_path}")
 
-    # Log execution: start RUNNING
-    execution = metadata_store_pb2.Execution()
-    execution.type_id = trainer_type_id
-    execution.properties['state'].string_value = 'RUNNING'
-    [execution] = store.put_executions([execution])
-    print(f"Started training execution ID: {execution.id}")
+    execution = register_execution(session, exec_type='Trainer', state='RUNNING')
 
-    # Link input data artifact
-    input_event = metadata_store_pb2.Event()
-    input_event.artifact_id = data_artifact.id
-    input_event.execution_id = execution.id
-    input_event.type = metadata_store_pb2.Event.INPUT
-    store.put_events([input_event])
+    # Link dataset as input artifact
+    link_artifact_execution(session, dataset_artifact.id, execution.id, 'INPUT')
 
-    # Register trained model artifact
-    model_artifact = metadata_store_pb2.Artifact()
-    model_artifact.type_id = model_type_id
-    model_artifact.uri = f'file://{os.path.abspath(model_path)}'
-    model_artifact.properties['version'].int_value = 1
-    model_artifact.properties['name'].string_value = 'LogisticRegressionModel'
-    [model_artifact] = store.put_artifacts([model_artifact])
-    print(f"Registered model artifact ID: {model_artifact.id}")
+    # Register and link model artifact as output
+    model_artifact = register_model(session, model_path)
+    link_artifact_execution(session, model_artifact.id, execution.id, 'OUTPUT')
 
-    # Link output model artifact to execution
-    output_event = metadata_store_pb2.Event()
-    output_event.artifact_id = model_artifact.id
-    output_event.execution_id = execution.id
-    output_event.type = metadata_store_pb2.Event.OUTPUT
-    store.put_events([output_event])
+    mark_execution_completed(session, execution)
 
-    # Mark execution as COMPLETED
-    execution.properties['state'].string_value = 'COMPLETED'
-    store.put_executions([execution])
-    print(f"Execution {execution.id} marked as COMPLETED.")
     return execution.id
 
-# --- Visualize execution metadata ---
-def visualize_metadata(store):
-    executions = store.get_executions()
-    states = [e.properties['state'].string_value for e in executions]
+# --- Visualize execution states ---
+def visualize_metadata(session):
+    executions = session.query(Execution).all()
+    states = [e.state for e in executions]
     counts = Counter(states)
 
     print("Execution states frequency:")
@@ -164,32 +184,30 @@ def visualize_metadata(store):
     plt.ylabel('Count')
     plt.show()
 
-# --- Print artifacts and lineage for a given execution ---
-def print_lineage(store, execution_id):
+# --- Print lineage for a given execution ---
+def print_lineage(session, execution_id):
     print(f"\nLineage info for execution ID: {execution_id}")
-    events = store.get_events_by_execution(execution_id)
-    input_artifact_ids = [e.artifact_id for e in events if e.type == metadata_store_pb2.Event.INPUT]
-    output_artifact_ids = [e.artifact_id for e in events if e.type == metadata_store_pb2.Event.OUTPUT]
+    events = session.query(Event).filter(Event.execution_id == execution_id).all()
+
+    input_artifacts = [e.artifact for e in events if e.type == 'INPUT']
+    output_artifacts = [e.artifact for e in events if e.type == 'OUTPUT']
 
     print("Input Artifacts:")
-    for aid in input_artifact_ids:
-        artifact = store.get_artifacts_by_id([aid])[0]
-        print(f"  ID: {artifact.id}, URI: {artifact.uri}")
+    for a in input_artifacts:
+        print(f"  ID: {a.id}, URI: {a.uri}")
 
     print("Output Artifacts:")
-    for aid in output_artifact_ids:
-        artifact = store.get_artifacts_by_id([aid])
-        print(f"  ID: {artifact.id}, URI: {artifact.uri}")
+    for a in output_artifacts:
+        print(f"  ID: {a.id}, URI: {a.uri}")
 
-# --- Main method ---
+# --- Main ---
 def main():
-    store = init_metadata_store()
-    data_path = create_and_save_dataset()
-    data_type_id, model_type_id, trainer_type_id = register_types(store)
-    data_artifact = register_dataset(store, data_type_id, data_path)
-    execution_id = train_and_log(store, trainer_type_id, model_type_id, data_artifact, data_path)
-    visualize_metadata(store)
-    print_lineage(store, execution_id)
+    session = init_metadata_store()
+    dataset_path = create_and_save_dataset()
+    dataset_artifact = register_dataset(session, dataset_path)
+    execution_id = train_and_log(session, dataset_artifact, dataset_path)
+    visualize_metadata(session)
+    print_lineage(session, execution_id)
 
 if __name__ == "__main__":
     main()
