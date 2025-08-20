@@ -1,0 +1,26 @@
+name: Docker Build (no push)
+
+on:
+  pull_request:
+    branches: [ mthree-422-salleh ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build image (no push)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/amd64
+          push: false
+          tags: test/local:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
