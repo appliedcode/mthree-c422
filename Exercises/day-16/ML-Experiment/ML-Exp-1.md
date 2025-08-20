@@ -38,13 +38,14 @@ from sklearn.metrics import accuracy_score
 
 # Load and split data
 iris = load_iris()
-X_train, X_test, y_train, y_test = train_test_split(iris.data, iris.target, test_size=0.25, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(
+    iris.data, iris.target, test_size=0.25, random_state=42
+)
 
-# Set MLflow experiment name (creates one if missing)
 mlflow.set_experiment("iris_rf_exp_tracking")
 
 with mlflow.start_run():
-    n_estimators = 50
+    n_estimators = 200
     clf = RandomForestClassifier(n_estimators=n_estimators)
     clf.fit(X_train, y_train)
     preds = clf.predict(X_test)
@@ -54,8 +55,19 @@ with mlflow.start_run():
     mlflow.log_param("n_estimators", n_estimators)
     mlflow.log_metric("accuracy", acc)
     
-    # Log the model
-    mlflow.sklearn.log_model(clf, "model")
+    # Add input_example and infer model signature
+    import pandas as pd
+    input_example = pd.DataFrame(X_train[:2], columns=iris.feature_names) # two sample rows from training
+    from mlflow.models.signature import infer_signature
+    signature = infer_signature(X_train, clf.predict(X_train))
+    
+    # Log the model with input example and signature
+    mlflow.sklearn.log_model(
+        clf,
+        name="model",
+        input_example=input_example,
+        signature=signature
+    )
     
     print(f"Logged run with accuracy: {acc:.4f}")
 ```
