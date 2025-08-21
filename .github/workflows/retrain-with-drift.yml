@@ -1,0 +1,93 @@
+name: Drift-Aware Model Retraining
+
+on:
+  workflow_call:
+    inputs:
+      drift_score:
+        required: true
+        type: string
+      data_drift:
+        required: true
+        type: string
+      concept_drift:
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      drift_score:
+        description: 'Drift score that triggered retraining'
+        required: true
+        default: '0.15'
+        type: string
+
+jobs:
+  retrain_model:
+    runs-on: ubuntu-latest
+    
+    outputs:
+      model_version: ${{ steps.version.outputs.version }}
+      accuracy: ${{ steps.train.outputs.accuracy }}
+      drift_score: ${{ inputs.drift_score }}
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.10.18
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r app/requirements.txt
+
+    - name: Set model version with drift info
+      id: version
+      run: |
+        TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+        DRIFT_SCORE=${{ inputs.drift_score }}
+        echo "version=v${TIMESTAMP}-drift${DRIFT_SCORE}" >> $GITHUB_OUTPUT
+
+    - name: Download dataset
+      run: |
+        curl -L -o spam.csv "https://raw.githubusercontent.com/mohitgupta-omg/Kaggle-SMS-Spam-Collection-Dataset-/master/spam.csv"
+
+    - name: Retrain model with drift awareness
+      id: train
+      run: |
+        python app/drift_aware_training.py \
+          --drift-score ${{ inputs.drift_score }} \
+          --data-drift ${{ inputs.data_drift || 'false' }} \
+          --concept-drift ${{ inputs.concept_drift || 'false' }}
+        echo "accuracy=$(cat model_accuracy.txt)" >> $GITHUB_OUTPUT
+
+    - name: Generate drift-aware model report
+      run: |
+        python app/generate_drift_report.py ${{ steps.version.outputs.version }} ${{ inputs.drift_score }}
+
+    - name: Upload model artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: drift-retrained-model-${{ steps.version.outputs.version }}
+        path: |
+          spam_model.joblib
+          vectorizer.joblib
+          drift_model_report.json
+          baseline_stats.json
+
+    - name: Trigger prediction and validation
+      if: success()
+      uses: peter-evans/repository-dispatch@v2
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        event-type: validate-drift-model
+        client-payload: |
+          {
+            "model_version": "${{ steps.version.outputs.version }}",
+            "accuracy": "${{ steps.train.outputs.accuracy }}",
+            "drift_score": "${{ inputs.drift_score }}",
+            "run_id": "${{ github.run_id }}",
+            "retrain_reason": "drift_detection"
+          }
