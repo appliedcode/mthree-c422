@@ -25,7 +25,15 @@ jobs:
 
     - name: Download dataset
       run: |
-        curl -L -o spam.csv https://raw.githubusercontent.com/justmarkham/pycon-2016-tutorial/master/data/spam.csv
+        curl -L -o spam.txt https://archive.ics.uci.edu/ml/machine-learning-databases/00228/SMSSpamCollection
+
+    - name: Convert dataset to CSV
+      run: |
+        python -c "
+        import pandas as pd
+        data = pd.read_csv('spam.txt', sep='\t', header=None, names=['label', 'text'])
+        data.to_csv('spam.csv', index=False)
+        "
 
     - name: Train Spam Classifier
       run: python app/train_spam_classifier.py
