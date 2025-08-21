@@ -21,17 +21,17 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
+        pip install -r app/requirements.txt
 
     - name: Download dataset
       run: |
         curl -L -o spam.csv https://raw.githubusercontent.com/justmarkham/pycon-2016-tutorial/master/data/spam.csv
 
     - name: Train Spam Classifier
-      run: python train_spam_classifier.py
+      run: python app/train_spam_classifier.py
 
     - name: Evaluate Spam Classifier
-      run: python evaluate_spam_classifier.py
+      run: python app/evaluate_spam_classifier.py
 
     - name: Upload model artifact
       uses: actions/upload-artifact@v4
