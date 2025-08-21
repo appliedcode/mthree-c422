@@ -23,24 +23,14 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r app/requirements.txt
 
-    - name: Download dataset
+    - name: Download dataset from alternative source
       run: |
-        curl -L -o spam.txt https://archive.ics.uci.edu/ml/machine-learning-databases/00228/SMSSpamCollection
-
-    - name: Convert dataset to CSV
-      run: |
-        python -c "
-        import pandas as pd
-        data = pd.read_csv('spam.txt', sep='\t', header=None, names=['label', 'text'])
-        print(f'Dataset shape: {data.shape}')
-        print(f'Label distribution:\n{data[\"label\"].value_counts()}')
-        data.to_csv('spam.csv', index=False)
-        print('Dataset saved to spam.csv')
-        "
+        curl -L -o spam.csv "https://raw.githubusercontent.com/mohitgupta-omg/Kaggle-SMS-Spam-Collection-Dataset-/master/spam.csv"
 
     - name: Verify dataset
       run: |
-        head -n 5 spam.csv
+        head -n 10 spam.csv
+        echo "Total lines:"
         wc -l spam.csv
 
     - name: Train Spam Classifier

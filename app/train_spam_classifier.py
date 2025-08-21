@@ -8,6 +8,13 @@ import joblib
 data = pd.read_csv('spam.csv', encoding='latin-1')
 print(f"Dataset loaded with {len(data)} rows")
 print(f"Columns: {list(data.columns)}")
+
+# Select only the first two columns (v1 and v2) and rename them
+data = data[['v1', 'v2']]
+data.columns = ['label', 'text']
+
+print(f"After cleaning - Dataset shape: {data.shape}")
+print(f"Label distribution:\n{data['label'].value_counts()}")
 print(f"First few rows:\n{data.head()}")
 
 # Ensure we have enough data
@@ -25,6 +32,8 @@ print(f"Test set size: {len(X_test)}")
 # Vectorize text
 vectorizer = CountVectorizer()
 X_train_vec = vectorizer.fit_transform(X_train)
+
+print(f"Vocabulary size: {len(vectorizer.vocabulary_)}")
 
 # Train model
 model = MultinomialNB()
