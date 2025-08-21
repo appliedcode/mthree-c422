@@ -32,8 +32,16 @@ jobs:
         python -c "
         import pandas as pd
         data = pd.read_csv('spam.txt', sep='\t', header=None, names=['label', 'text'])
+        print(f'Dataset shape: {data.shape}')
+        print(f'Label distribution:\n{data[\"label\"].value_counts()}')
         data.to_csv('spam.csv', index=False)
+        print('Dataset saved to spam.csv')
         "
+
+    - name: Verify dataset
+      run: |
+        head -n 5 spam.csv
+        wc -l spam.csv
 
     - name: Train Spam Classifier
       run: python app/train_spam_classifier.py

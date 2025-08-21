@@ -6,10 +6,21 @@ import joblib
 
 # Load dataset
 data = pd.read_csv('spam.csv', encoding='latin-1')
-# columns are: 'label' and 'text'
+print(f"Dataset loaded with {len(data)} rows")
+print(f"Columns: {list(data.columns)}")
+print(f"First few rows:\n{data.head()}")
+
+# Ensure we have enough data
+if len(data) < 10:
+    raise ValueError(f"Dataset too small: only {len(data)} rows")
 
 # Train/test split
-X_train, X_test, y_train, y_test = train_test_split(data['text'], data['label'], test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(
+    data['text'], data['label'], test_size=0.2, random_state=42
+)
+
+print(f"Training set size: {len(X_train)}")
+print(f"Test set size: {len(X_test)}")
 
 # Vectorize text
 vectorizer = CountVectorizer()
@@ -22,3 +33,5 @@ model.fit(X_train_vec, y_train)
 # Save model and vectorizer
 joblib.dump(model, 'spam_model.joblib')
 joblib.dump(vectorizer, 'vectorizer.joblib')
+
+print("Model trained and saved successfully!")
