@@ -115,18 +115,22 @@ def main():
         }
         detector.save_baseline_stats(baseline_stats)
 
+        # If user requested force-retrain, honor it even on first run
+        should_retrain = args.force_retrain
+
         out = os.environ['GITHUB_OUTPUT']
         with open(out, 'a') as fh:
             fh.write("data_drift_detected=false\n")
             fh.write("concept_drift_detected=false\n")
             fh.write("drift_score=0.0\n")
-            fh.write("should_retrain=false\n")
+            fh.write(f"should_retrain={str(should_retrain).lower()}\n")
 
         report = {
             'timestamp': datetime.now().isoformat(),
             'baseline_created': True,
             'drift_detected': False,
-            'message': 'Baseline statistics created from current data'
+            'force_retrain': should_retrain,
+            'message': 'Baseline created—or force retrain if requested'
         }
         with open('drift_report.json', 'w') as f:
             json.dump(report, f, indent=2)
