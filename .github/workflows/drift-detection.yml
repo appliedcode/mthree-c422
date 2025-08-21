@@ -1,7 +1,5 @@
 name: Drift Detection and Model Retraining
 
-# Trigger re-index: 2025-08-21
-
 on:
   workflow_dispatch:
     inputs:
@@ -52,9 +50,12 @@ jobs:
     - name: Detect drift
       id: drift_check
       run: |
-        python app/drift_detection.py \
-          --threshold ${{ github.event.inputs.drift_threshold || '0.1' }} \
-          --force-retrain ${{ github.event.inputs.force_retrain || 'false' }}
+        CMD="python app/drift_detection.py --threshold ${{ github.event.inputs.drift_threshold }}"
+        if [ "${{ github.event.inputs.force_retrain }}" = "true" ]; then
+          CMD="$CMD --force-retrain"
+        fi
+        echo "Running: $CMD"
+        $CMD
 
     - name: Upload drift report
       uses: actions/upload-artifact@v4
