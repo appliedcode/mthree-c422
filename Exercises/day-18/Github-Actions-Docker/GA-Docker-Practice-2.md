@@ -1,25 +1,25 @@
-# Lab Exercise: Automating Titanic Survival Prediction with Docker and GitHub Actions
+# Lab Exercise: Automating Titanic Survival Prediction Pipeline with Multi-Stage GitHub Actions and Docker
 
 
 ***
 
 ## Objective
 
-Build and automate a machine learning pipeline to predict Titanic passenger survival, containerize the environment with Docker, and automate training, evaluation, and artifact management using GitHub Actions CI/CD.
+Build a containerized ML pipeline to predict Titanic passenger survival and automate training, evaluation, model artifact management, and optional Docker image publication using a **multi-stage GitHub Actions workflow**.
 
 ***
 
 ## Use Case Scenario
 
-Predict whether a passenger survived the Titanic disaster based on demographic and travel information. Automate the entire workflow from data preprocessing to model packaging with Docker and CI/CD pipelines.
+Predict whether a passenger survived the Titanic disaster from demographics and travel info. The training and evaluation are automated in stages inside a Docker container through continuous integration/deployment pipelines.
 
 ***
 
 ## Prerequisites
 
-- Python, Docker, Git, and GitHub knowledge
-- Basic understanding of classification models
-- A GitHub account and Docker installed locally
+- Python, Docker, Git, GitHub basics
+- Understanding of binary classification and ML pipelines
+- GitHub account, Docker installed locally
 
 ***
 
@@ -27,7 +27,7 @@ Predict whether a passenger survived the Titanic disaster based on demographic a
 
 ### 1. Create GitHub Repo
 
-- Create repo named `titanic-survival-docker-ci`
+- Name it `titanic-survival-docker-ci`
 - Clone locally:
 
 ```bash
@@ -36,12 +36,14 @@ cd titanic-survival-docker-ci
 ```
 
 
-### 2. Add Python scripts, Dockerfile, and requirements
+***
+
+### 2. Add Python Scripts, Dockerfile, Requirements
 
 
 ***
 
-### train_titanic.py
+#### train_titanic.py
 
 ```python
 import pandas as pd
@@ -50,14 +52,13 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
-from sklearn.metrics import accuracy_score
 import joblib
 
-# Load dataset
+# Load Titanic data
 url = 'https://raw.githubusercontent.com/datasciencedojo/datasets/master/titanic.csv'
 df = pd.read_csv(url)
 
-# Basic preprocessing
+# Preprocess: select relevant columns and drop missing data
 df = df[['Survived', 'Pclass', 'Sex', 'Age', 'Fare']].dropna()
 
 X = df.drop('Survived', axis=1)
@@ -67,7 +68,7 @@ y = df['Survived']
 categorical_features = ['Sex']
 numerical_features = ['Pclass', 'Age', 'Fare']
 
-# Preprocessing pipeline
+# Build preprocessing pipeline
 preprocessor = ColumnTransformer([
     ('cat', OneHotEncoder(), categorical_features)
 ], remainder='passthrough')
@@ -77,28 +78,25 @@ pipeline = Pipeline([
     ('classifier', LogisticRegression(max_iter=200))
 ])
 
-# Train/test split
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+# Train/test split (not training-test split here, all data used to train model artifact)
+pipeline.fit(X, y)
 
-# Train model
-pipeline.fit(X_train, y_train)
-
-# Save model
+# Save trained model pipeline
 joblib.dump(pipeline, 'titanic_model.joblib')
-print("Model trained and saved as titanic_model.joblib")
+print("Titanic model trained and saved as titanic_model.joblib")
 ```
 
 
 ***
 
-### evaluate_titanic.py
+#### evaluate_titanic.py
 
 ```python
 import pandas as pd
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 import joblib
 
-# Load test dataset
+# Load Titanic data for evaluation
 url = 'https://raw.githubusercontent.com/datasciencedojo/datasets/master/titanic.csv'
 df = pd.read_csv(url)
 df = df[['Survived', 'Pclass', 'Sex', 'Age', 'Fare']].dropna()
@@ -106,13 +104,13 @@ df = df[['Survived', 'Pclass', 'Sex', 'Age', 'Fare']].dropna()
 X = df.drop('Survived', axis=1)
 y = df['Survived']
 
-# Load model
+# Load trained model pipeline
 model = joblib.load('titanic_model.joblib')
 
-# Predict
+# Predict on eval data
 y_pred = model.predict(X)
 
-# Metrics
+# Calculate metrics
 accuracy = accuracy_score(y, y_pred)
 precision = precision_score(y, y_pred)
 recall = recall_score(y, y_pred)
@@ -125,7 +123,7 @@ print(f"Recall: {recall:.4f}")
 
 ***
 
-### requirements.txt
+#### requirements.txt
 
 ```
 pandas
@@ -136,7 +134,7 @@ joblib
 
 ***
 
-### Dockerfile
+#### Dockerfile (Multi-stage build NOT included here as multi-stage handled in workflow)
 
 ```Dockerfile
 FROM python:3.9-slim
@@ -158,91 +156,132 @@ CMD ["python", "train_titanic.py"]
 
 ```bash
 git add .
-git commit -m "Add Titanic training, evaluation scripts, Dockerfile, and requirements"
+git commit -m "Add Titanic train, evaluate scripts, requirements, and Dockerfile"
 git push origin main
 ```
 
 
 ***
 
-## Step 2: GitHub Actions Workflow
-
-### 1. Create workflow directory and file
-
-```bash
-mkdir -p .github/workflows
-```
+## Step 2: Multi-Stage GitHub Actions Workflow
 
 Create `.github/workflows/titanic-docker-ci.yml`:
 
 ```yaml
-name: Titanic Survival Docker CI/CD
+name: Titanic Survival Multi-Stage CI/CD
 
 on:
   push:
     branches: [ main ]
 
 jobs:
-  build_and_test:
-    runs-on: ubuntu-latest
 
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      image: ${{ steps.build-image.outputs.image }}
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Build Docker image
+      id: build-image
+      run: |
+        docker build -t titanic-survival:latest .
+        echo "image=titanic-survival:latest" >> $GITHUB_OUTPUT
+
+  train:
+    runs-on: ubuntu-latest
+    needs: build
+    outputs:
+      model-path: ${{ steps.train.outputs.model-path }}
     steps:
     - name: Checkout repo
       uses: actions/checkout@v3
 
-    - name: Setup Docker Buildx
-      uses: docker/setup-buildx-action@v2
-
-    - name: Build Docker image
-      run: docker build -t titanic-survival:latest .
-
     - name: Run training container
-      run: docker run --rm titanic-survival:latest
-
-    - name: Run evaluation container
-      run: docker run --rm titanic-survival:latest python evaluate_titanic.py
+      id: train
+      run: |
+        docker run --rm titanic-survival:latest python train_titanic.py
+        echo "model-path=titanic_model.joblib" >> $GITHUB_OUTPUT
 
     - name: Upload model artifact
       uses: actions/upload-artifact@v3
       with:
-        name: titanic_model
+        name: titanic-model
         path: titanic_model.joblib
+
+  evaluate:
+    runs-on: ubuntu-latest
+    needs: train
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Download model artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: titanic-model
+        path: .
+
+    - name: Build Docker image
+      run: docker build -t titanic-survival:latest .
+
+    - name: Run evaluation
+      run: docker run --rm -v ${{ github.workspace }}:/app -w /app titanic-survival:latest python evaluate_titanic.py
+
+  publish:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Push Docker image
+      run: |
+        docker tag titanic-survival:latest your-dockerhub-username/titanic-survival:latest
+        docker push your-dockerhub-username/titanic-survival:latest
 ```
 
 
 ***
 
-### 2. Commit and push workflow
+## Step 3: Verify Pipeline
 
-```bash
-git add .github/workflows/titanic-docker-ci.yml
-git commit -m "Add GitHub Actions workflow for Docker build, training, and evaluation"
-git push origin main
-```
-
+- Push changes to trigger GitHub Actions workflow.
+- Verify the **build**, **train**, **evaluate**, and optionally **publish** stages succeed.
+- Confirm the model artifact is uploaded.
+- Check logs for metrics output.
 
 ***
 
-## Step 3: Verify
+## Optional Extensions:
 
-- Monitor workflow runs under GitHub Actions tab.
-- Ensure all steps pass.
-- Confirm `titanic_model.joblib` artifact uploaded.
-
-***
-
-## Optional Extensions
-
-- Push Docker image to container registry.
-- Add notifications on workflow status.
-- Extend to serve model as API in a container.
-- Add tests and validation steps to workflow.
+- Add unit tests and integrate into workflow.
+- Deploy model container as API.
+- Implement notifications on workflow events.
+- Cache Docker layers to speed up builds.
 
 ***
 
 ## Deliverables
 
-- GitHub repo with training, evaluation scripts, Dockerfile, workflow
-- Evidence of successful automated runs with artifacts
+- GitHub repository with:
+    - `train_titanic.py`
+    - `evaluate_titanic.py`
+    - `requirements.txt`
+    - `Dockerfile`
+    - `.github/workflows/titanic-docker-ci.yml`
+- Evidence of successful multi-stage GitHub Actions runs and artifact uploads.
 
 ***
