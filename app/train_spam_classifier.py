@@ -39,7 +39,7 @@ print(f"Vocabulary size: {len(vectorizer.vocabulary_)}")
 model = MultinomialNB()
 model.fit(X_train_vec, y_train)
 
-# Save model and vectorizer
+# Save model and vectorizers
 joblib.dump(model, 'spam_model.joblib')
 joblib.dump(vectorizer, 'vectorizer.joblib')
 
