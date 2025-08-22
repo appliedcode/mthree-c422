@@ -1,0 +1,97 @@
+name: Drift Detection and Model Retraining
+
+on:
+  workflow_dispatch:
+    inputs:
+      drift_threshold:
+        description: 'Drift detection threshold (0.0-1.0)'
+        required: true
+        default: '0.1'
+        type: string
+      force_retrain:
+        description: 'Force retraining regardless of drift'
+        required: false
+        default: false
+        type: boolean
+  schedule:
+    # Run drift detection daily at 6 AM UTC
+    - cron: '0 6 * * *'
+  repository_dispatch:
+    types: [check-drift]
+
+jobs:
+  detect_drift:
+    runs-on: ubuntu-latest
+    
+    outputs:
+      data_drift_detected: ${{ steps.drift_check.outputs.data_drift_detected }}
+      concept_drift_detected: ${{ steps.drift_check.outputs.concept_drift_detected }}
+      drift_score: ${{ steps.drift_check.outputs.drift_score }}
+      should_retrain: ${{ steps.drift_check.outputs.should_retrain }}
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.10.18
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r app/requirements.txt
+
+    - name: Download current dataset
+      run: |
+        curl -L -o current_data.csv "https://raw.githubusercontent.com/mohitgupta-omg/Kaggle-SMS-Spam-Collection-Dataset-/master/spam.csv"
+
+    - name: Detect drift
+      id: drift_check
+      run: |
+        CMD="python app/drift_detection.py --threshold ${{ github.event.inputs.drift_threshold }}"
+        if [ "${{ github.event.inputs.force_retrain }}" = "true" ]; then
+          CMD="$CMD --force-retrain"
+        fi
+        echo "Running: $CMD"
+        $CMD
+
+    - name: Upload drift report
+      uses: actions/upload-artifact@v4
+      with:
+        name: drift-analysis-${{ github.run_id }}
+        path: |
+          drift_report.json
+          drift_visualizations.png
+          baseline_stats.json
+
+    - name: Comment on drift detection results
+      if: github.event_name == 'workflow_dispatch'
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const driftDetected = '${{ steps.drift_check.outputs.data_drift_detected }}' === 'true' || 
+                               '${{ steps.drift_check.outputs.concept_drift_detected }}' === 'true';
+          const driftScore = '${{ steps.drift_check.outputs.drift_score }}';
+          
+          const message = driftDetected ? 
+            `🚨 **Drift Detected!** 
+             - Data Drift: ${{ steps.drift_check.outputs.data_drift_detected }}
+             - Concept Drift: ${{ steps.drift_check.outputs.concept_drift_detected }}
+             - Drift Score: ${driftScore}
+             - Retraining will be triggered automatically.` :
+            `✅ **No Significant Drift Detected**
+             - Drift Score: ${driftScore}
+             - Model remains stable.`;
+          
+          console.log(message);
+
+  trigger_retraining:
+    needs: detect_drift
+    if: needs.detect_drift.outputs.should_retrain == 'true'
+    uses: ./.github/workflows/retrain-with-drift.yml
+    with:
+      drift_score: ${{ needs.detect_drift.outputs.drift_score }}
+      data_drift: ${{ needs.detect_drift.outputs.data_drift_detected }}
+      concept_drift: ${{ needs.detect_drift.outputs.concept_drift_detected }}
