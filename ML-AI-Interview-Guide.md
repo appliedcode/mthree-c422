@@ -111,13 +111,6 @@
 - **"Machine Learning Design Interview" by Alex Xu & Sahn Lam** - https://www.amazon.com/Machine-Learning-System-Design-Interview/dp/1736049127
 - **"Machine Learning System Design" by Valerii Babushkin** - https://www.oreilly.com/library/view/machine-learning-system/9781633438750/
 
-### 💻 Online Platforms
-
-#### Interview-Specific Preparation
-- **Techademy AI ML Interview Preparation** - https://www.techademy.com/ai-ml-interview-preparation-program
-- **Exponent ML Interview Course** - https://www.tryexponent.com/courses/machine-learning-interview
-- **365 Data Science AI Engineer Prep** - https://365datascience.com/career-advice/job-interview-tips/ai-engineer-interview-questions/
-
 ### 🧠 Practice Platforms
 
 #### Coding Practice
@@ -147,26 +140,12 @@
 - **ProjectPro MLOps Questions** - https://www.projectpro.io/article/mlops-interview-questions-and-answers/971
 - **Indeed ML Engineer Questions** - https://in.indeed.com/career-advice/interviewing/machine-learning-engineer-interview-questions
 
-### 🎯 Mock Interview Services
-
-#### Paid Services
-- **Pramp** - https://www.pramp.com/
-- **InterviewBit** - https://www.interviewbit.com/
-- **Exponent Mock Interviews** - https://www.tryexponent.com/
-
 #### Free Resources
 - **LeetCode Mock Interviews** - https://leetcode.com/interview/
 - **Reddit Communities**: r/MachineLearning, r/MLOps, r/cscareerquestions
 - **Discord Communities**: ML Twitter, MLOps Community
 
 ### 🏢 Company-Specific Preparation
-
-#### FAANG Companies
-- **Google AI** - Focus on TensorFlow, TPUs, large-scale ML
-- **Meta AI** - PyTorch, computer vision, NLP applications
-- **Amazon** - AWS services, SageMaker, scalable systems
-- **Apple** - On-device ML, Core ML, privacy-preserving ML
-- **Netflix** - Recommendation systems, A/B testing, personalization
 
 #### Company Engineering Blogs
 - **Google AI Blog** - https://ai.googleblog.com/
